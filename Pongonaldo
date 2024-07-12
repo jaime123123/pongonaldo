@@ -1,0 +1,656 @@
+import pygame, sys, random
+ 
+pygame.init()
+ 
+WIDTH, HEIGHT = 1280, 720
+ 
+font = pygame.font.SysFont("Consolas", int(WIDTH/20))
+ 
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Pongonaldo")
+clock = pygame.time.Clock()
+
+
+bike = pygame.image.load("bikezonacr7.png")
+bike = pygame.transform.scale(bike, (1280,720))
+
+rony = pygame.image.load("rony.png")
+rony = pygame.transform.scale(rony, (1280,720))
+
+r7 = pygame.image.load("ronaldo7.png")
+r7 = pygame.transform.scale(r7, (1280,720))
+
+r = pygame.image.load("ronaldo.png")
+r = pygame.transform.scale(r, (1280,720))
+
+siu = pygame.image.load("al nassr.png")
+siu = pygame.transform.scale(siu, (1280,720))
+
+
+#Paddles
+
+player = pygame.Rect(WIDTH-110, HEIGHT/2-50, 10, 100)
+opponent = pygame.Rect(110, HEIGHT/2-50, 10, 100)
+player_score, opponent_score = 0, 0
+
+
+#Ball
+
+ball = pygame.Rect(WIDTH/2-10, HEIGHT/2-10, 20, 20) 
+
+x_speed, y_speed = 1, 1
+
+
+#Multiplayer
+
+def multiplayer():
+    global x_speed, y_speed, player_score, opponent_score
+    
+
+    #Player Controls
+
+    while True:
+        keys_pressed = pygame.key.get_pressed()
+
+
+        if keys_pressed[pygame.K_UP]:
+            if player.top > 0:
+                player.top -= 2
+
+        if keys_pressed[pygame.K_DOWN]:             
+            if player.bottom < HEIGHT:
+                player.bottom += 2
+
+        screen.blit(rony,(0, 0))
+
+
+    #Ball Speed and Collisions
+
+        if ball.y >= HEIGHT:
+            y_speed = -1
+        if ball.y <= 0:
+            y_speed = 1
+        if ball.x <= 0:
+            player_score += 1
+            ball.center = (WIDTH/2, HEIGHT/2)
+            x_speed, y_speed = random.choice([1, -1]), random.choice([1, -1])
+        if ball.x >= WIDTH:
+            opponent_score += 1
+            ball.center = (WIDTH/2, HEIGHT/2)
+            x_speed, y_speed = random.choice([1, -1]), random.choice([1, -1])   
+        if player.x - ball.width <= ball.x <= player.x and ball.y in range(player.top-ball.width, player.bottom+ball.width):
+            x_speed = -1
+        if opponent.x - ball.width <= ball.x <= opponent.x and ball.y in range(opponent.top-ball.width, opponent.bottom+ball.width):
+            x_speed = 1
+
+        ball.x += x_speed * 2
+        ball.y += y_speed * 2
+
+
+    #Score
+
+        player_score_text = font.render(str(player_score), True, "white")
+        opponent_score_text = font.render(str(opponent_score), True, "white")
+
+
+    #Opponent Controls
+
+        keys_pressed = pygame.key.get_pressed()
+        
+        if keys_pressed[pygame.K_w]:
+            if opponent.top > 0:
+                opponent.top -= 2
+        if keys_pressed[pygame.K_s]:
+            if opponent.bottom < HEIGHT:
+                opponent.bottom += 2
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+
+    #Player, Opponent and Ball 
+
+        pygame.draw.rect(screen, "white", player)
+        pygame.draw.rect(screen, "white", opponent)
+        pygame.draw.circle(screen, "white", ball.center, 10) 
+        
+
+    #Score and Score Position
+
+        screen.blit(player_score_text, (WIDTH/2+20, 50))
+        screen.blit(opponent_score_text, (WIDTH/2-70, 50))
+        
+        pygame.display.update()
+        clock.tick(300)
+
+
+#Singleplayer
+
+def singleplayer():
+    global x_speed, y_speed, player_score, opponent_score
+    
+
+    #Player Controls
+
+    while True:
+        keys_pressed = pygame.key.get_pressed()
+
+
+        if keys_pressed[pygame.K_UP]:
+            if player.top > 0:
+                player.top -= 2
+
+        if keys_pressed[pygame.K_DOWN]:             
+            if player.bottom < HEIGHT:
+                player.bottom += 2
+
+        screen.blit(r7,(0, 0))
+
+
+    #Ball Speed and Collisions
+
+        if ball.y >= HEIGHT:
+            y_speed = -1
+        if ball.y <= 0:
+            y_speed = 1
+        if ball.x <= 0:
+            player_score += 1
+            ball.center = (WIDTH/2, HEIGHT/2)
+            x_speed, y_speed = random.choice([1, -1]), random.choice([1, -1])
+        if ball.x >= WIDTH:
+            opponent_score += 1
+            ball.center = (WIDTH/2, HEIGHT/2)
+            x_speed, y_speed = random.choice([1, -1]), random.choice([1, -1])   
+        if player.x - ball.width <= ball.x <= player.x and ball.y in range(player.top-ball.width, player.bottom+ball.width):
+            x_speed = -1
+        if opponent.x - ball.width <= ball.x <= opponent.x and ball.y in range(opponent.top-ball.width, opponent.bottom+ball.width):
+            x_speed = 1
+
+        ball.x += x_speed * 2
+        ball.y += y_speed * 2
+
+
+    #AI
+        if opponent.y < ball.y:
+            opponent.top += 1
+        if opponent.bottom > ball.y:
+            opponent.bottom -= 1
+        
+
+    #Score
+
+        player_score_text = font.render(str(player_score), True, "white")
+        opponent_score_text = font.render(str(opponent_score), True, "white")
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+
+    #Player, Opponent and Ball
+        pygame.draw.rect(screen, "white", player)
+        pygame.draw.rect(screen, "white", opponent)
+        pygame.draw.circle(screen, "red", ball.center, 10) 
+        
+
+    #Score and Score Position
+
+        screen.blit(player_score_text, (WIDTH/2+20, 50))
+        screen.blit(opponent_score_text, (WIDTH/2-70, 50))
+    
+        pygame.display.update()
+        clock.tick(300)
+
+
+    #Level 1
+
+def level_1():
+    global x_speed, y_speed, player_score, opponent_score, obstacle_1
+
+
+     #Player Controls
+
+    while True:
+        keys_pressed = pygame.key.get_pressed()
+
+
+        if keys_pressed[pygame.K_UP]:
+            if player.top > 0:
+                player.top -= 2
+
+        if keys_pressed[pygame.K_DOWN]:             
+            if player.bottom < HEIGHT:
+                player.bottom += 2
+                
+        screen.blit(r,(0, 0))
+
+
+    #Ball Speed and Collisions
+
+        if ball.y >= HEIGHT:
+            y_speed = -1
+        if ball.y <= 0:
+            y_speed = 1
+        if ball.x <= 0:
+            player_score += 1
+            ball.center = (WIDTH/2, HEIGHT/2)
+            x_speed, y_speed = random.choice([1, -1]), random.choice([1, -1])
+        if ball.x >= WIDTH:
+            opponent_score += 1
+            ball.center = (WIDTH/2, HEIGHT/2)
+            x_speed, y_speed = random.choice([1, -1]), random.choice([1, -1])   
+        if player.x - ball.width <= ball.x <= player.x and ball.y in range(player.top-ball.width, player.bottom+ball.width):
+            x_speed = -1
+        if opponent.x - ball.width <= ball.x <= opponent.x and ball.y in range(opponent.top-ball.width, opponent.bottom+ball.width):
+            x_speed = 1
+        
+
+        ball.x += x_speed * 2.5
+        ball.y += y_speed * 2.5
+
+
+    #Score
+
+        player_score_text = font.render(str(player_score), True, "white")
+        opponent_score_text = font.render(str(opponent_score), True, "white")
+
+
+    #Opponent Controls
+
+        keys_pressed = pygame.key.get_pressed()
+        
+        if keys_pressed[pygame.K_w]:
+            if opponent.top > 0:
+                opponent.top -= 2
+        if keys_pressed[pygame.K_s]:
+            if opponent.bottom < HEIGHT:
+                opponent.bottom += 2
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+
+    #Player, Opponent and Ball
+
+        pygame.draw.rect(screen, "white", player)
+        pygame.draw.rect(screen, "white", opponent)
+        pygame.draw.circle(screen, "white", ball.center, 10) 
+        
+
+    #Score and Score Position
+
+        screen.blit(player_score_text, (WIDTH/2+20, 50))
+        screen.blit(opponent_score_text, (WIDTH/2-70, 50))
+
+        pygame.display.update()
+        clock.tick(300)
+
+
+    #Level 2
+
+def level_2():
+    global x_speed, y_speed, player_score, opponent_score
+    
+
+    #Player Controls
+
+    while True:
+        keys_pressed = pygame.key.get_pressed()
+
+
+        if keys_pressed[pygame.K_UP]:
+            if player.top > 0:
+                player.top -= 2
+
+        if keys_pressed[pygame.K_DOWN]:             
+            if player.bottom < HEIGHT:
+                player.bottom += 2
+
+        screen.blit(siu,(0, 0))
+
+
+    #Ball Speed and Collisions
+
+        if ball.y >= HEIGHT:
+            y_speed = -1
+        if ball.y <= 0:
+            y_speed = 1
+        if ball.x <= 0:
+            player_score += 1
+            ball.center = (WIDTH/2, HEIGHT/2)
+            x_speed, y_speed = random.choice([1, -1]), random.choice([1, -1])
+        if ball.x >= WIDTH:
+            opponent_score += 1
+            ball.center = (WIDTH/2, HEIGHT/2)
+            x_speed, y_speed = random.choice([1, -1]), random.choice([1, -1])   
+        if player.x - ball.width <= ball.x <= player.x and ball.y in range(player.top-ball.width, player.bottom+ball.width):
+            x_speed = -1
+        if opponent.x - ball.width <= ball.x <= opponent.x and ball.y in range(opponent.top-ball.width, opponent.bottom+ball.width):
+            x_speed = 1
+
+        ball.x += x_speed * 3
+        ball.y += y_speed * 3
+
+
+    #Score
+
+        player_score_text = font.render(str(player_score), True, "white")
+        opponent_score_text = font.render(str(opponent_score), True, "white")
+
+
+    #Opponent Controls
+
+        keys_pressed = pygame.key.get_pressed()
+        
+        if keys_pressed[pygame.K_w]:
+            if opponent.top > 0:
+                opponent.top -= 2
+        if keys_pressed[pygame.K_s]:
+            if opponent.bottom < HEIGHT:
+                opponent.bottom += 2
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+
+    #Player, Opponent and Ball 
+
+        pygame.draw.rect(screen, "white", player)
+        pygame.draw.rect(screen, "white", opponent)
+        pygame.draw.circle(screen, "white", ball.center, 10) 
+        
+
+    #Score and Score Position
+
+        screen.blit(player_score_text, (WIDTH/2+20, 50))
+        screen.blit(opponent_score_text, (WIDTH/2-70, 50))
+        
+        pygame.display.update()
+        clock.tick(300)
+
+
+#Level 3
+
+def level_3():
+    global x_speed, y_speed, player_score, opponent_score
+
+
+
+    #Player Controls  
+  
+    while True:
+        keys_pressed = pygame.key.get_pressed()
+
+
+        if keys_pressed[pygame.K_UP]:
+            if player.top > 0:
+                player.top -= 2
+
+        if keys_pressed[pygame.K_DOWN]:             
+            if player.bottom < HEIGHT:
+                player.bottom += 2
+        
+        screen.blit(bike,(0, 0))
+
+    #Ball Speed and Collisions
+
+        if ball.y >= HEIGHT:
+            y_speed = -1
+        if ball.y <= 0:
+            y_speed = 1
+        if ball.x <= 0:
+            player_score += 1
+            ball.center = (WIDTH/2, HEIGHT/2)
+            x_speed, y_speed = random.choice([1, -1]), random.choice([1, -1])
+        if ball.x >= WIDTH:
+            opponent_score += 1
+            ball.center = (WIDTH/2, HEIGHT/2)
+            x_speed, y_speed = random.choice([1, -1]), random.choice([1, -1])   
+        if player.x - ball.width <= ball.x <= player.x and ball.y in range(player.top-ball.width, player.bottom+ball.width):
+            x_speed = -1
+        if opponent.x - ball.width <= ball.x <= opponent.x and ball.y in range(opponent.top-ball.width, opponent.bottom+ball.width):
+            x_speed = 1
+
+
+        ball.x += x_speed * 3.5
+        ball.y += y_speed * 3.5
+
+
+    #Score
+
+        player_score_text = font.render(str(player_score), True, "white")
+        opponent_score_text = font.render(str(opponent_score), True, "white")
+
+
+    #Opponent Controls
+
+        keys_pressed = pygame.key.get_pressed()
+        
+        if keys_pressed[pygame.K_w]:
+            if opponent.top > 0:
+                opponent.top -= 2
+        if keys_pressed[pygame.K_s]:
+            if opponent.bottom < HEIGHT:
+                opponent.bottom += 2
+
+
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+
+    #Player, Opponent and Ball 
+
+        pygame.draw.rect(screen, "white", player)
+        pygame.draw.rect(screen, "white", opponent)
+        pygame.draw.circle(screen, "white", ball.center, 10) 
+        
+
+    #Score and Score Position
+
+        screen.blit(player_score_text, (WIDTH/2+20, 50))
+        screen.blit(opponent_score_text, (WIDTH/2-70, 50))
+        
+
+        pygame.display.update()
+        clock.tick(300)
+
+
+#Menu
+
+image = pygame.image.load("ronaldo-drinking.png")
+image = pygame.transform.scale(image, (1280,720))
+screen.blit(image,(0, 0))
+
+while True:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+
+
+    #Info
+
+    menu = font.render("Singleplayer: Left Click", True, "white")
+    screen.blit(menu, (WIDTH/2-500, HEIGHT/2+110))
+
+    menu = font.render("Multiplayer: Right Click", True, "white")
+    screen.blit(menu, (WIDTH/2-500, HEIGHT/2+200))
+
+    menu = font.render("Levels: 1, 2, 3", True, "white")
+    screen.blit(menu, (WIDTH/2-275, HEIGHT/2+290))
+
+
+    #Gamemodes 
+
+    keys_pressed = pygame.mouse.get_pressed()
+
+    if keys_pressed[0]:
+        singleplayer()
+        break
+
+    elif keys_pressed[2]:
+        multiplayer()
+        break
+
+    keys_pressed = pygame.key.get_pressed()
+    if keys_pressed[pygame.K_1]:
+        level_1()
+        break
+
+    keys_pressed = pygame.key.get_pressed()
+    if keys_pressed[pygame.K_2]:
+        level_2()
+        break
+
+    keys_pressed = pygame.key.get_pressed()
+    if keys_pressed[pygame.K_3]:
+        level_3()
+        break
+
+
+    #Singleplayer Button
+
+    singleplayer_e = pygame.Rect(WIDTH/2-525, HEIGHT/2-275, 5, 100)
+    singleplayer_f = pygame.Rect(WIDTH/2-25, HEIGHT/2-275, 5, 100)
+    singleplayer_g = pygame.Rect(WIDTH/2-525, HEIGHT/2-275, 500, 5)
+    singleplayer_h = pygame.Rect(WIDTH/2-525, HEIGHT/2-175, 505, 5)
+
+    pygame.draw.rect(screen, "white", singleplayer_e)
+    pygame.draw.rect(screen, "white", singleplayer_f)
+    pygame.draw.rect(screen, "white", singleplayer_g)
+    pygame.draw.rect(screen, "white", singleplayer_h)
+
+
+    menu = font.render("Singleplayer", True, "white")
+    screen.blit(menu, (WIDTH/2-500, HEIGHT/2-260))
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit() 
+
+    
+
+    #Multiplayer  Button
+
+    multiplayer_a = pygame.Rect(WIDTH/2+550, HEIGHT/2-275, 5, 100)
+    multiplayer_b = pygame.Rect(WIDTH/2+60, HEIGHT/2-275, 5, 100)
+    multiplayer_c = pygame.Rect(WIDTH/2+65, HEIGHT/2-275, 490, 5)
+    multiplayer_d = pygame.Rect(WIDTH/2+60, HEIGHT/2-175, 495, 5)
+
+    pygame.draw.rect(screen, "white", multiplayer_a)
+    pygame.draw.rect(screen, "white", multiplayer_b)
+    pygame.draw.rect(screen, "white", multiplayer_c)
+    pygame.draw.rect(screen, "white", multiplayer_d)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    keys_pressed = pygame.mouse.get_pressed()
+    if (keys_pressed[2]):
+        break
+    
+    menu = font.render("Multiplayer", True, "white")
+    screen.blit(menu, (WIDTH/2+100, HEIGHT/2-260)) 
+
+
+    #Level 1 Button
+
+    levels_i = pygame.Rect(WIDTH/2-600, HEIGHT/2-90, 5, 100)
+    levels_j = pygame.Rect(WIDTH/2-250, HEIGHT/2-90, 5, 100)
+    levels_k = pygame.Rect(WIDTH/2-600, HEIGHT/2-90, 350, 5)
+    levels_l = pygame.Rect(WIDTH/2-600, HEIGHT/2+10, 355, 5)
+
+    pygame.draw.rect(screen, "white", levels_i)
+    pygame.draw.rect(screen, "white", levels_j)
+    pygame.draw.rect(screen, "white", levels_k)
+    pygame.draw.rect(screen, "white", levels_l)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    keys_pressed = pygame.key.get_pressed()
+
+
+    if keys_pressed[pygame.K_1]:
+        break
+
+    menu = font.render("Level 1", True, "white")
+    screen.blit(menu, (WIDTH/2-550, HEIGHT/2-70)) 
+
+
+    #Level 2 Button
+
+    levels_m = pygame.Rect(WIDTH/2+250, HEIGHT/2-90, 5, 100)
+    levels_n = pygame.Rect(WIDTH/2-200, HEIGHT/2-90, 5, 100)
+    levels_o = pygame.Rect(WIDTH/2-200, HEIGHT/2-90, 450, 5)
+    levels_p = pygame.Rect(WIDTH/2-200, HEIGHT/2+10, 455, 5)
+
+    pygame.draw.rect(screen, "white", levels_m)
+    pygame.draw.rect(screen, "white", levels_n)
+    pygame.draw.rect(screen, "white", levels_o)
+    pygame.draw.rect(screen, "white", levels_p)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    keys_pressed = pygame.key.get_pressed()
+
+
+    if keys_pressed[pygame.K_2]:
+        break
+
+    menu = font.render("Level 2", True, "white")
+    screen.blit(menu, (WIDTH/2-100, HEIGHT/2-70)) 
+
+
+    #Level 3 Button
+
+    levels_q = pygame.Rect(WIDTH/2+275, HEIGHT/2-90, 5, 100)
+    levels_r = pygame.Rect(WIDTH/2+625, HEIGHT/2-90, 5, 100)
+    levels_s = pygame.Rect(WIDTH/2+275, HEIGHT/2-90, 355, 5)
+    levels_t = pygame.Rect(WIDTH/2+275, HEIGHT/2+10, 355, 5)
+
+    pygame.draw.rect(screen, "white", levels_q)
+    pygame.draw.rect(screen, "white", levels_r)
+    pygame.draw.rect(screen, "white", levels_s)
+    pygame.draw.rect(screen, "white", levels_t)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+    keys_pressed = pygame.key.get_pressed()
+
+
+    if keys_pressed[pygame.K_3]:
+        break
+
+    menu = font.render("Level 3", True, "white")
+    screen.blit(menu, (WIDTH/2+300, HEIGHT/2-70)) 
+
+
+    pygame.display.flip()
+    dt = clock.tick(60) / 1000
+    
+
+    
+
+
